@@ -41,6 +41,21 @@ func (m cgroupManager) setUnifiedResources(bundle goci.Bndl) error {
 	return nil
 }
 
+func (m cgroupManager) mountUnifiedCgroup(bundle *goci.Bndl) {
+	if bundle.Spec.Linux.CgroupsPath != "" && bundle.Spec.Annotations["container-type"] == "garden-init" && cgroups.IsCgroup2UnifiedMode() {
+		// Mount the cgroup v2 hierarchy inside the container
+		// at /sys/fs/cgroup so that processes inside the container
+		// can see their cgroup settings. This is not done in "rundmc/runcontainerd/runcontainerd.go" because
+		// we want to mount the "init" cgroup specifically instead of the whole hierarchy.
+		bundle.Spec.Mounts = append(bundle.Spec.Mounts, specs.Mount{
+			Destination: "/sys/fs/cgroup",
+			Type:        "bind",
+			Source:      filepath.Join("/sys/fs/cgroup", bundle.CGroupPath()),
+			Options:     []string{"bind", "ro", "nosuid", "noexec", "nodev"},
+		})
+	}
+}
+
 func convertSpecResourcesToCgroupResources(specResources *specs.LinuxResources) *cgroups.Resources {
 	if specResources == nil {
 		return nil
