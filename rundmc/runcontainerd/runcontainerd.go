@@ -132,8 +132,6 @@ func (r *RunContainerd) Create(log lager.Logger, id string, bundle goci.Bndl, pi
 		return err
 	}
 
-	r.cgroupManager.MountUnifiedCgroup(&bundle)
-
 	containerRootUID := idmapper.MappingList(bundle.Spec.Linux.UIDMappings).Map(0)
 	containerRootGID := idmapper.MappingList(bundle.Spec.Linux.GIDMappings).Map(0)
 

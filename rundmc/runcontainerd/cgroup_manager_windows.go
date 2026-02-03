@@ -7,5 +7,3 @@ import (
 func (m cgroupManager) setUnifiedResources(bundle goci.Bndl) error {
 	return nil
 }
-
-func (m cgroupManager) mountUnifiedCgroup(bundle *goci.Bndl) { return nil }
